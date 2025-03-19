@@ -1,3 +1,4 @@
+import os
 import torch
 from model import ColaModel
 from data import DataModule
@@ -30,5 +31,7 @@ class ColaPredictor:
 
 if __name__ == "__main__":
     sentence = "The boy is sitting on a bench"
-    predictor = ColaPredictor("./models/epoch=2-step=804.ckpt")
+    ckpt_dir = "./models/"
+    ckpt_path = [i for i in os.listdir(ckpt_dir) if i.endswith('ckpt')][0]
+    predictor = ColaPredictor(os.path.join(ckpt_dir, ckpt_path))
     print(predictor.predict(sentence))
