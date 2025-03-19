@@ -14,12 +14,13 @@ class ColaPredictor:
         self.lables = ["unacceptable", "acceptable"]
 
     def predict(self, text):
+        self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        self.model.to(self.device)
         inference_sample = {"sentence": text}
         processed = self.processor.tokenize_data(inference_sample)
-        logits = self.model(
-            torch.tensor([processed["input_ids"]]),
-            torch.tensor([processed["attention_mask"]]),
-        )
+        input_ids = torch.tensor([processed["input_ids"]]).to(self.device)
+        attention_mask = torch.tensor([processed["attention_mask"]]).to(self.device)
+        logits = self.model(input_ids, attention_mask)
         scores = self.softmax(logits[0]).tolist()
         predictions = []
         for score, label in zip(scores, self.lables):
@@ -29,5 +30,5 @@ class ColaPredictor:
 
 if __name__ == "__main__":
     sentence = "The boy is sitting on a bench"
-    predictor = ColaPredictor("./models/epoch=0-step=267.ckpt")
+    predictor = ColaPredictor("./models/epoch=2-step=804.ckpt")
     print(predictor.predict(sentence))
